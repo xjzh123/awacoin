@@ -14,3 +14,11 @@ Supports:
 Doesn't support:
 
 - Custom server URL (Can be done through editing source code)
+
+Usage:
+
+awacoin mine [number of threads]
+
+awacoin info [account1] [account2] ...
+
+awacoin transfer [account] [amount]

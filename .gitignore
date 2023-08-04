@@ -1,3 +1,11 @@
 *.exe
 *.awacoin_wallet
 *.py
+
+# WIP
+
+cuda.zh.md
+*.cu
+*.cuh
+*.obj
+sha512cuda.nim

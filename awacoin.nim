@@ -25,16 +25,19 @@ proc minecoin(account, password: string, diff: int) =
   let (id, salt, hash) = (res["id"].getStr, res["salt"].getStr, res["hash"].getStr)
   print &"Mining id: {id}, salt: {salt}, hash: {hash}"
   for i in 0..diff:
-    if i mod 1000000 == 0:
-      print $i
     if count[MHASH_SHA512]($i & salt).`$` == hash:
       print &"Got {i}(value) + {salt}(salt) for hash: {hash}"
-      let res = client.postContent(ApiSubmit, body = encodeQuery({"id": id,
-          "answer": $i})).parseJson
-      if res{"error"}.getStr != "":
-        print &"""Mine hash: {hash} error: {res["error"].getStr}"""
-      else:
-        print &"""Mine hash: {hash} success! Balance: {res["balance"].getFloat:.2f}"""
+      for j in 1..5:
+        try:
+          let res = client.postContent(ApiSubmit, body = encodeQuery({"id": id,
+              "answer": $i})).parseJson
+          if res{"error"}.getStr != "":
+            print &"""Mine hash: {hash} error: {res["error"].getStr}"""
+          else:
+            print &"""Mine hash: {hash} success! Balance: {res["balance"].getFloat:.2f}"""
+          break
+        except ProtocolError as e:
+          print &"{e.msg} ({j}/5 retry)"
       break
   client.close()
 

@@ -1,5 +1,9 @@
-import std/[os, strutils, strformat, httpclient, uri, json, parseopt, threadpool]
-import checksums/md5
+import std/[os, strutils, strformat, httpclient, uri, json, parseopt, threadpool, cpuinfo]
+import hashlib/mhash/sha512
+
+proc print(s: string) =
+  let s = s & "\n"
+  discard stdout.writeBuffer(cstring(s), len(s))
 
 const
   WalletPath = ".awacoin_wallet"
@@ -19,18 +23,18 @@ proc minecoin(account, password: string, diff: int) =
   let res = client.postContent(ApiHash, body = encodeQuery({"account": account,
       "password": password})).parseJson
   let (id, salt, hash) = (res["id"].getStr, res["salt"].getStr, res["hash"].getStr)
-  echo &"Mining id: {id}, salt: {salt}, hash: {hash}"
+  print &"Mining id: {id}, salt: {salt}, hash: {hash}"
   for i in 0..diff:
     if i mod 1000000 == 0:
-      echo i
-    if $toMD5($i & salt) == hash:
-      echo &"Got {i}(value) + {salt}(salt) for hash: {hash}"
+      print $i
+    if count[MHASH_SHA512]($i & salt).`$` == hash:
+      print &"Got {i}(value) + {salt}(salt) for hash: {hash}"
       let res = client.postContent(ApiSubmit, body = encodeQuery({"id": id,
           "answer": $i})).parseJson
       if res{"error"}.getStr != "":
-        echo &"""Mine hash: {hash} error: {res["error"].getStr}"""
+        print &"""Mine hash: {hash} error: {res["error"].getStr}"""
       else:
-        echo &"""Mine hash: {hash} success! Balance: {res["balance"].getFloat:.2f}"""
+        print &"""Mine hash: {hash} success! Balance: {res["balance"].getFloat:.2f}"""
       break
   client.close()
 
@@ -38,17 +42,18 @@ proc minecoin_thread(account, password: string, diff: int) {.thread.} =
   while true:
     minecoin(account, password, diff)
 
-proc mine(account, password: string, threadn: Positive) =
+proc mine(account, password: string, threadcount: Positive) =
+  echo &"Mining with {threadcount} threads."
   let client = newHttpClient(headers = headers)
-  echo "Getting chunk range."
+  print "Getting chunk range."
   let diff = client.getContent(ApiChunkDiff).parseJson["diff"].getInt
   client.close()
-  echo &"Chunk range: {diff}"
-  if threadn == 1:
+  print &"Chunk range: {diff}"
+  if threadcount == 1:
     while true:
       minecoin(account, password, diff)
   else:
-    for i in 1..threadn:
+    for i in 1..threadcount:
       spawn minecoin_thread(account, password, diff)
     sync()
 
@@ -71,37 +76,37 @@ proc getOptions(): (Mode, seq[string]) =
         of "transfer":
           result[0] = mTransfer
         else:
-          echo &"Unknown mode: {key}."
+          print &"Unknown mode: {key}."
           quit()
         i = 1
       else:
         result[1].add key
     else:
-      echo &"Unsupported option: {kind}, {key}, {val}"
+      print &"Unsupported option: {kind}, {key}, {val}"
   if i == 0:
-    echo "Mode [mine/info/transfer] not found."
+    print "Mode [mine/info/transfer] not found."
     quit()
 
 when isMainModule:
   if not fileExists(WalletPath):
-    echo "Registering... If you dont want to use registered account, replace the .awacoin_wallet file with yours."
+    print "Registering... If you dont want to use registered account, replace the .awacoin_wallet file with yours."
     let client = newHttpClient()
     let res = client.getContent(ApiRegister).parseJson()
-    echo &"Registered: {res}\nSaving account."
+    print &"Registered: {res}\nSaving account."
     writeFile(WalletPath, $Host & "+" & res["account"].getStr & "+" & res[
         "password"].getStr)
   let temp = readFile(WalletPath).split('+')
   let (_, account, password) = (temp[0], temp[1], temp[2])
   let (mode, args) = getOptions()
-  echo &"Awacoin Nim\nMode: {($mode).substr(1)} Account: {account} Arguments: {args}"
+  print &"Awacoin Nim\nMode: {($mode).substr(1)} Account: {account} Arguments: {args}"
   case mode
   of mMine:
-    let threadn =
+    let threadcount =
       if args.len == 1:
         args[0].parseInt
       else:
-        1
-    mine(account, password, threadn)
+        countProcessors()
+    mine(account, password, threadcount)
   of mInfo:
     let wallets =
       if args.len == 0:
@@ -111,14 +116,14 @@ when isMainModule:
     let client = newHttpClient()
     for wallet in wallets:
       let res = client.getContent(ApiBalance ? {"account": wallet})
-      echo (&"""
+      print (&"""
         Info for account {wallet}: {res.strip()}
         Balance: {res.parseJson["balance"].getFloat:.2f}
       """).dedent
     client.close()
   of mTransfer:
     if args.len != 2:
-      echo "Target account or amount not given."
+      print "Target account or amount not given."
       quit()
     let (target, amount) = (args[0], args[1])
     let client = newHttpClient(headers = headers)
@@ -126,4 +131,4 @@ when isMainModule:
         "account": account, "password": password, "to": target,
         "amount": amount}))
     client.close()
-    echo &"Response:\n{res}"
+    print &"Response:\n{res}"

@@ -22,7 +22,6 @@ proc minecoin(account, password, hashcatdir: string, diff: int) =
   let (id, salt, hash) = (res["id"].getStr, res["salt"].getStr, res["hash"].getStr)
   print &"Mining id: {id}, salt: {salt}, hash: {hash}"
   let i = brute(hash, salt, hashcatdir)
-  print i
   print &"Got {i}(value) + {salt}(salt) for hash: {hash}"
   for j in 1..5:
     try:

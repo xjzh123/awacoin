@@ -25,7 +25,7 @@ awacoin transfer [account] [amount]
 
 ## Hashcat Miner
 
-Uses hashcat to mine awacoin. Fast!
+Uses hashcat to mine awacoin. Fast![^1]
 
 Usage:
 
@@ -40,3 +40,5 @@ Example file content:
 ```
 Path/To/hashcat-6.2.6
 ```
+
+[^1]: On my computer, 12 threads in one process is the most efficient. When Awacoin Nim uses 12 threads, its efficiency is close to Awacoin Nim Hashcat Miner.

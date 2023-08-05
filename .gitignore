@@ -8,4 +8,5 @@ cuda.zh.md
 *.cu
 *.cuh
 *.obj
-sha512cuda.nim
+*.so
+*cuda*

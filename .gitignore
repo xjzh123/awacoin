@@ -1,6 +1,7 @@
 *.exe
 *.awacoin_wallet
 *.py
+.hashcatdir
 
 # WIP
 

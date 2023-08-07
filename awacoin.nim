@@ -1,5 +1,5 @@
 import std/[os, strutils, strformat, httpclient, uri, json, parseopt, threadpool, cpuinfo]
-import nimcrypto
+import nimcrypto/sha2
 
 proc print(s: string) =
   let s = s & "\n"

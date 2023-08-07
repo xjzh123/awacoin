@@ -9,7 +9,7 @@ Supports:
 - Transferring coins
 - Mining coins
 - Multi thread mining
-- Faster than official python client (till 2023.8.3 22:37)
+- Faster than official python client
 
 Doesn't support:
 

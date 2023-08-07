@@ -11,3 +11,4 @@ cuda.zh.md
 *.obj
 *.so
 *cuda*
+*.dll

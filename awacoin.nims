@@ -1,2 +1,3 @@
 --define:ssl
 --define:threads
+--define:nimcryptoLowercase

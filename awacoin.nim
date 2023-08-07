@@ -31,7 +31,7 @@ proc minecoin(account, password: string, diff: int) =
   let (id, salt, hash) = (res["id"].getStr, res["salt"].getStr, res["hash"].getStr)
   print &"Mining id: {id}, salt: {salt}, hash: {hash}"
   for i in 0..diff:
-    if sha512_nimcrypto($i & salt).`$` == hash:
+    if sha512_nimcrypto($i & salt) == hash:
       print &"Got {i}(value) + {salt}(salt) for hash: {hash}"
       for j in 1..5:
         try:

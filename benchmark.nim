@@ -1,7 +1,7 @@
 import std/[times, strutils]
 import checksums/sha2
-import hashlib
-import nimcrypto
+import hashlib/[mhash, rhash]
+import nimcrypto/sha2
 
 template timeit(body: untyped) =
   let a = cpuTime()
@@ -25,7 +25,7 @@ proc sha512_nimcrypto(s: string): string =
   init(ctx)
   ctx.update(s)
   ctx.finish().`$`
-  
+
 for fun in [sha512_checksums, sha512_rhash, sha512_mhash, sha512_nimcrypto]:
   timeit:
     for i in 1..1000000:

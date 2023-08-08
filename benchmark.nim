@@ -2,7 +2,9 @@
 
 import std/[times, strutils]
 import checksums/sha2
-import hashlib/[mhash, rhash, sph]
+import hashlib//mhash/sha512
+import hashlib/rhash/sha512
+import hashlib/sph/sha512
 import nimcrypto/sha2
 
 template timeit(body: untyped) =

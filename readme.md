@@ -59,4 +59,4 @@ Example file content:
 Path/To/hashcat-6.2.6
 ```
 
-[^1]: On my computer, 12 threads in one process is the most efficient. When Awacoin Nim uses 12 threads, its efficiency is close to Awacoin Nim Hashcat Miner.
+[^1]: On my computer, when Awacoin Nim uses 12 threads, its efficiency is 0.044 AWC/min. Hashcat Miner's is 0.06 AWC/min.

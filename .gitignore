@@ -2,13 +2,12 @@
 *.awacoin_wallet
 *.py
 .hashcatdir
+*.ignore.*
 
 # WIP
 
-cuda.zh.md
-*.cu
-*.cuh
-*.obj
-*.so
-*cuda*
-*.dll
+cuda
+
+# test files
+
+test

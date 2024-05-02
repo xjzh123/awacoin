@@ -52,7 +52,7 @@ proc minecoin_thread(account, password: string, diff: int) {.thread.} =
     minecoin(account, password, diff)
 
 proc mine(account, password: string, threadcount: Positive) =
-  echo &"Mining with {threadcount} threads."
+  print &"Mining with {threadcount} threads."
   let client = newHttpClient(headers = headers)
   print "Getting chunk range."
   let diff = client.getContent(ApiChunkDiff).parseJson["diff"].getInt
